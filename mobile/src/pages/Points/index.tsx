@@ -1,74 +1,90 @@
-import React, { useState, useEffect } from 'react'
 import { Feather as Icon } from '@expo/vector-icons'
-import { View, StyleSheet, Image, Alert, SafeAreaView, Text, TouchableOpacity, ScrollView } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
+import * as Location from 'expo-location'
+import React, { useEffect, useState } from 'react'
+import {
+  Alert,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import { SvgUri } from 'react-native-svg'
 import api from '../../services/api'
-import * as Location from 'expo-location'
 
 interface Item {
-  id: number,
-  title: string,
+  id: string
+  title: string
   image_url: string
 }
 
 interface Point {
-  id: number,
-  name: string,
-  image: string,
-  image_url: string,
-  latitude: number,
+  id: string
+  name: string
+  image: string
+  image_url: string
+  latitude: number
   longitude: number
 }
 
 interface Params {
-  uf: string,
+  uf: string
   city: string
 }
 
 const Points = () => {
-  const [items,setItems] = useState<Item[]>([])
-  const [points,setPoints] = useState<Point[]>([])
-  const [selectedItems, setSelectedItems] = useState<number[]>([])
+  const [items, setItems] = useState<Item[]>([])
+  const [points, setPoints] = useState<Point[]>([])
+  const [selectedItems, setSelectedItems] = useState<string[]>([])
 
-  const [initialPosition, setInitialPosition] = useState<[number, number]>([0, 0])
+  const [initialPosition, setInitialPosition] = useState<[number, number]>([
+    0, 0,
+  ])
 
   const navigation = useNavigation()
   const route = useRoute()
 
   const routeParams = route.params as Params
 
-  function handleSelectedItem(id: number){
-    const alreadySelected = selectedItems.findIndex(item => item === id)
+  function handleSelectedItem(id: string) {
+    const alreadySelected = selectedItems.findIndex((item) => item === id)
 
-    if (alreadySelected >= 0){
-        const filteredItems = selectedItems.filter(item => item !== id)
+    if (alreadySelected >= 0) {
+      const filteredItems = selectedItems.filter((item) => item !== id)
 
-        setSelectedItems([...filteredItems])
-    }else{
-        setSelectedItems ([...selectedItems, id])
+      setSelectedItems([...filteredItems])
+    } else {
+      setSelectedItems([...selectedItems, id])
     }
   }
 
   useEffect(() => {
-    api.get('points', {
-      params: {
-        city: routeParams.city,
-        uf: routeParams.uf,
-        items: selectedItems
-      }
-    }).then(response => {
-      setPoints(response.data)
-    })
+    api
+      .get('points', {
+        params: {
+          city: routeParams.city.trim(),
+          uf: routeParams.uf,
+          items: JSON.stringify(selectedItems),
+        },
+      })
+      .then((response) => {
+        setPoints(response.data)
+      })
   }, [selectedItems])
 
-  useEffect(()=> {
-    async function loadPosition(){
-      const { status } = await Location.requestPermissionsAsync()
+  useEffect(() => {
+    async function loadPosition() {
+      const { status } = await Location.requestForegroundPermissionsAsync()
 
-      if(status !== 'granted'){
-        Alert.alert('Ooops...','Precisamos de permissão para obtar a localização')
+      if (status !== 'granted') {
+        Alert.alert(
+          'Ooops...',
+          'Precisamos de permissão para obtar a localização'
+        )
         return
       }
 
@@ -81,82 +97,88 @@ const Points = () => {
     loadPosition()
   }, [])
 
-  useEffect(()=> {
-    api.get('items').then(response => {
+  useEffect(() => {
+    api.get('items').then((response) => {
       setItems(response.data)
     })
-  },[])
+  }, [])
 
-  function handleNavigateBack(){
+  function handleNavigateBack() {
     navigation.goBack()
   }
 
-  function handleNavigateToDetail(id: number){
+  function handleNavigateToDetail(id: string) {
     navigation.navigate('Detail', { point_id: id })
   }
 
-  return(
-    <SafeAreaView style={{ flex: 1}}>
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <TouchableOpacity onPress={handleNavigateBack}>
-          <Icon name="arrow-left" size={20} color="#34cb79"/>
+          <Icon name="arrow-left" size={20} color="#34cb79" />
         </TouchableOpacity>
 
         <Text style={styles.title}>Bem vindo.</Text>
-        <Text style={styles.description}>Encontre no mapa um ponto de coleta</Text>
+        <Text style={styles.description}>
+          Encontre no mapa um ponto de coleta
+        </Text>
 
         <View style={styles.mapContainer}>
-          { initialPosition[0] !== 0 && (
-              <MapView 
+          {initialPosition[0] !== 0 && (
+            <MapView
               style={styles.map}
               loadingEnabled={initialPosition[0] === 0}
               initialRegion={{
                 latitude: initialPosition[0],
                 longitude: initialPosition[1],
                 latitudeDelta: 0.014,
-                longitudeDelta: 0.014
+                longitudeDelta: 0.014,
               }}
             >
-              {points.map(point => (
-                <Marker 
+              {points.map((point) => (
+                <Marker
                   key={String(point.id)}
                   style={styles.mapMarker}
                   onPress={() => handleNavigateToDetail(point.id)}
                   coordinate={{
-                    latitude: point.latitude,
-                    longitude: point.longitude
+                    latitude: Number(point.latitude),
+                    longitude: Number(point.longitude),
                   }}
                 >
                   <View style={styles.mapMarkerContainer}>
-                    <Image style={styles.mapMarkerImage} source={{ uri: point.image_url}} />
+                    <Image
+                      style={styles.mapMarkerImage}
+                      source={{ uri: point.image_url }}
+                    />
                     <Text style={styles.mapMarkerTitle}>{point.name}</Text>
                   </View>
                 </Marker>
               ))}
             </MapView>
-          ) }
+          )}
         </View>
       </View>
-      
+
       <View style={styles.itemsContainer}>
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false} 
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 20 }}
         >
-          
-          {items.map(item => (
-            <TouchableOpacity 
+          {items.map((item) => (
+            <TouchableOpacity
               key={String(item.id)}
-              style={[styles.item, selectedItems.includes(item.id) ? styles.selectedItem : {}]}
+              style={[
+                styles.item,
+                selectedItems.includes(item.id) ? styles.selectedItem : {},
+              ]}
               onPress={() => handleSelectedItem(item.id)}
               activeOpacity={0.6}
             >
-            <SvgUri width={42} height={42} uri={item.image_url} />
-            <Text style={styles.itemTitle}>{item.title}</Text>
-          </TouchableOpacity>
+              <SvgUri width={42} height={42} uri={item.image_url} />
+              <Text style={styles.itemTitle}>{item.title}</Text>
+            </TouchableOpacity>
           ))}
-          
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -169,7 +191,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 32,
-    paddingTop: 20
+    paddingTop: 20,
   },
 
   title: {
@@ -200,7 +222,7 @@ const styles = StyleSheet.create({
 
   mapMarker: {
     width: 90,
-    height: 80, 
+    height: 80,
   },
 
   mapMarkerContainer: {
@@ -210,7 +232,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     borderRadius: 8,
     overflow: 'hidden',
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   mapMarkerImage: {
@@ -260,4 +282,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 13,
   },
-});
+})

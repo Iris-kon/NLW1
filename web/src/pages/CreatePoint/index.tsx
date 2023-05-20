@@ -5,6 +5,7 @@ import React, {
   FormEvent,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -21,7 +22,7 @@ import './styles.css'
 import logo from '../../assets/logo.svg'
 
 interface Item {
-  id: number
+  id: string
   title: string
   image_url: string
 }
@@ -51,7 +52,7 @@ const CreatePoint = () => {
 
   const [selectedUf, setSelectedUf] = useState('0')
   const [selectedCity, setSelectedCity] = useState('0')
-  const [selectedItems, setSelectedItems] = useState<number[]>([])
+  const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [selectedPosition, setSelectedPosition] = useState<[number, number]>([
     0, 0,
   ])
@@ -59,11 +60,12 @@ const CreatePoint = () => {
 
   const navigate = useNavigate()
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
       const { latitude, longitude } = position.coords
 
       setInitialPosition([latitude, longitude])
+      setSelectedPosition([latitude, longitude])
     })
   }, [])
 
@@ -118,7 +120,7 @@ const CreatePoint = () => {
     setFormData({ ...formData, [name]: value })
   }
 
-  function handleSelectedItem(id: number) {
+  function handleSelectedItem(id: string) {
     const alreadySelected = selectedItems.findIndex((item) => item === id)
 
     if (alreadySelected >= 0) {
@@ -263,14 +265,16 @@ const CreatePoint = () => {
             <span>Selecione o endereço no mapa</span>
           </legend>
 
-          <MapContainer center={initialPosition} zoom={15}>
-            <TileLayer
-              attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
+          {initialPosition[0] !== 0 && initialPosition[1] !== 0 ? (
+            <MapContainer center={initialPosition} zoom={15}>
+              <TileLayer
+                attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
 
-            <DraggableMarker />
-          </MapContainer>
+              <DraggableMarker />
+            </MapContainer>
+          ) : null}
 
           <div className="field-group">
             <div className="field">

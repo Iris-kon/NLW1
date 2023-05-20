@@ -1,25 +1,33 @@
-import React, {useState, useEffect} from 'react'
-import { Feather as Icon, FontAwesome } from '@expo/vector-icons'
-import { SafeAreaView, View, StyleSheet, Text, Image, TouchableOpacity, Linking } from 'react-native'
+import { FontAwesome, Feather as Icon } from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native'
+import * as MailComposer from 'expo-mail-composer'
+import React, { useEffect, useState } from 'react'
+import {
+  Image,
+  Linking,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import { RectButton } from 'react-native-gesture-handler'
 import api from '../../services/api'
-import * as MailComposer from 'expo-mail-composer'
 
-interface Params{
+interface Params {
   point_id: number
 }
 
 interface Data {
   point: {
-    image: string,
-    name: string,
-    email: string,
-    image_url: string,
-    whatsapp: string,
-    city: string,
+    image: string
+    name: string
+    email: string
+    image_url: string
+    whatsapp: string
+    city: string
     uf: string
-  },
+  }
   items: {
     title: string
   }[]
@@ -34,61 +42,68 @@ const Detail = () => {
   const routeParams = route.params as Params
 
   useEffect(() => {
-    api.get(`points/${routeParams.point_id}`).then( response => {
+    api.get(`points/${routeParams.point_id}`).then((response) => {
       setData(response.data)
     })
   }, [])
 
-  function handleNavigateBack(){
+  function handleNavigateBack() {
     navigation.goBack()
   }
 
-  function handleWhatsapp(){
-    Linking.openURL(`whatapp://send?phone${data.point.whatsapp}&text= Tenho interesse sobre a coleta de  resíduos`)
+  function handleWhatsapp() {
+    Linking.openURL(
+      `whatapp://send?phone${data.point.whatsapp}&text= Tenho interesse sobre a coleta de  resíduos`
+    )
   }
 
-  function handleComposeMail(){
+  function handleComposeMail() {
     MailComposer.composeAsync({
       subject: 'Interesse na coleta de resíduos',
-      recipients: [data.point.email]
+      recipients: [data.point.email],
     })
   }
 
-  if(!data.point){
+  if (!data.point) {
     return null
   }
 
-  return(
-    <SafeAreaView style={{ flex: 1}}>
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <TouchableOpacity onPress={handleNavigateBack}>
-          <Icon name="arrow-left" size={20} color="#34cb79"/>
+          <Icon name="arrow-left" size={20} color="#34cb79" />
         </TouchableOpacity>
-      
-        <Image style={styles.pointImage} source={{ uri: data.point.image_url }} />
+
+        <Image
+          style={styles.pointImage}
+          source={{ uri: data.point.image_url }}
+        />
 
         <Text style={styles.pointName}>{data.point.name}</Text>
         <Text style={styles.pointItems}>
-          {data.items.map(item => item.title).join(', ')}
+          {data.items.map((item) => item.title).join(', ')}
         </Text>
 
         <View style={styles.address}>
-          <Text style={styles.addressTitle}>{data.point.city}</Text>
-          <Text style={styles.addressContent}>{data.point.uf}</Text>
+          <Text style={styles.addressTitle}>Endereço</Text>
+          <Text style={styles.addressContent}>
+            {data.point.city}, {data.point.uf}
+          </Text>
         </View>
-     </View>
+      </View>
 
-     <View style={styles.footer}>
+      <View style={styles.footer}>
         <RectButton style={styles.button} onPress={handleWhatsapp}>
-          <FontAwesome name="whatsapp"  size={20} color="#fff" />
+          <FontAwesome name="whatsapp" size={20} color="#fff" />
           <Text style={styles.buttonText}>whatsapp</Text>
         </RectButton>
 
         <RectButton style={styles.button} onPress={handleComposeMail}>
-          <Icon name="mail"  size={20} color="#fff" />
+          <Icon name="mail" size={20} color="#fff" />
           <Text style={styles.buttonText}>E-mail</Text>
         </RectButton>
-     </View>
+      </View>
     </SafeAreaView>
   )
 }
@@ -104,7 +119,7 @@ const styles = StyleSheet.create({
 
   pointImage: {
     width: '100%',
-    height: 120,
+    height: '30%',
     resizeMode: 'cover',
     borderRadius: 10,
     marginTop: 32,
@@ -112,23 +127,23 @@ const styles = StyleSheet.create({
 
   pointName: {
     color: '#322153',
-    fontSize: 28,
+    fontSize: 46,
     fontFamily: 'Ubuntu_700Bold',
     marginTop: 24,
   },
 
   pointItems: {
     fontFamily: 'Roboto_400Regular',
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 28,
+    lineHeight: 32,
     marginTop: 8,
-    color: '#6C6C80'
+    color: '#34CB79',
   },
 
   address: {
     marginTop: 32,
   },
-  
+
   addressTitle: {
     color: '#322153',
     fontFamily: 'Roboto_500Medium',
@@ -139,7 +154,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto_400Regular',
     lineHeight: 24,
     marginTop: 8,
-    color: '#6C6C80'
+    color: '#6C6C80',
   },
 
   footer: {
@@ -148,9 +163,9 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 32,
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
-  
+
   button: {
     width: '48%',
     backgroundColor: '#34CB79',
@@ -158,7 +173,7 @@ const styles = StyleSheet.create({
     height: 50,
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   buttonText: {
@@ -167,4 +182,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Roboto_500Medium',
   },
-});
+})
