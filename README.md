@@ -17,24 +17,24 @@ The project was developed in Next level week 1 from Rocketseat.
 
 <b>Home:</b>
 
-![home](https://github.com/Thiago-kon/NLW1/blob/master/web/src/assets/design/home.PNG)
+![home](https://github.com/Iris-kon/NLW1/blob/master/web/src/assets/design/home.PNG)
 
 <b>Register:</b>
 
-![rgister](https://github.com/Thiago-kon/NLW1/blob/master/web/src/assets/design/new-point.png)
+![rgister](https://github.com/Iris-kon/NLW1/blob/master/web/src/assets/design/new-point.png)
 
 ## Mobile Screens
 <b>Home:</b>
 
-![home](https://github.com/Thiago-kon/NLW1/blob/master/mobile/assets/design/Screenshot_20230519-235928_Expo%20Go.jpg)
+![home](https://github.com/Iris-kon/NLW1/blob/master/mobile/assets/design/Screenshot_20230519-235928_Expo%20Go.jpg)
 
 <b>Find Points:</b>
 
-![find_points](https://github.com/Thiago-kon/NLW1/blob/master/mobile/assets/design/Screenshot_20230519-235915_Expo%20Go.jpg)
+![find_points](https://github.com/Iris-kon/NLW1/blob/master/mobile/assets/design/Screenshot_20230519-235915_Expo%20Go.jpg)
 
 <b>Point Info:</b>
 
-![point_info](https://github.com/Thiago-kon/NLW1/blob/master/mobile/assets/design/Screenshot_20230519-235922_Expo%20Go.jpg)
+![point_info](https://github.com/Iris-kon/NLW1/blob/master/mobile/assets/design/Screenshot_20230519-235922_Expo%20Go.jpg)
 
 ## Used Technologies
 The project utilises the following technologies:
@@ -54,7 +54,7 @@ The project utilises the following technologies:
 ## Run project
 Copy the project to the desired folder with the following command:
 
-### `git clone https://github.com/Thiago-kon/NLW1`
+### `git clone https://github.com/Iris-kon/NLW1`
 
 Go to the server paste
 
